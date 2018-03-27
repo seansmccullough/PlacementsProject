@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PlacementsProject.Models.ViewModels
 {
+    /// <summary>
+    /// View model for Campaign
+    /// </summary>
     public class CampaignViewModel
     {
         /// <summary>
@@ -12,7 +15,7 @@ namespace PlacementsProject.Models.ViewModels
         public int Id { get; set; }
 
         /// <summary>
-        /// Campaign name
+        /// Campaign Name
         /// </summary>
         [Display(Name = "Campaign Name")]
         public string Name { get; set; }
@@ -27,10 +30,17 @@ namespace PlacementsProject.Models.ViewModels
         /// </summary>
         public ICollection<LineItemViewModel> LineItems { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CampaignViewModel()
         {
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="campaign">Campaign</param>
         public CampaignViewModel(Campaign campaign)
         {
             Id = campaign.Id;

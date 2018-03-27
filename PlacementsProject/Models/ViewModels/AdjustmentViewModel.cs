@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PlacementsProject.Models.ViewModels
 {
+    /// <summary>
+    /// View Model for Adjustment
+    /// </summary>
     public class AdjustmentViewModel
     {
         /// <summary>
@@ -11,7 +14,7 @@ namespace PlacementsProject.Models.ViewModels
         public string Id { get; set; }
 
         /// <summary>
-        /// LineItem Id, foreign key
+        /// Id of LineItem associated with this Adjustment
         /// </summary>
         public int LineItemId { get; set; }
 
@@ -33,10 +36,17 @@ namespace PlacementsProject.Models.ViewModels
         [Display(Name = "Adjustment Time")]
         public DateTime DateTime { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public AdjustmentViewModel()
         {
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="adjustment">Adjustment</param>
         public AdjustmentViewModel(Adjustment adjustment)
         {
             Id = adjustment.Id;

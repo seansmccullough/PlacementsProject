@@ -25,6 +25,8 @@ namespace PlacementsProject.Controllers
         {
             var campaigns = from s in _context.Campaigns
                 select s;
+
+            // Select sort order
             switch (sortOrder)
             {
                 case "CampaignIdAsc":
@@ -50,12 +52,17 @@ namespace PlacementsProject.Controllers
                     campaigns = campaigns.OrderBy(r => r.Id);
                     break;
             }
+
             ViewData["CurrentSort"] = sortOrder;
+
+            // Retrieve page of data
             int pageSize = 25;
             var count = await campaigns.AsNoTracking().CountAsync();
-            var items = await campaigns.AsNoTracking().Skip((page ?? 1 - 1) * pageSize).Take(pageSize).ToListAsync();
+            var campaignList = await campaigns.AsNoTracking().Skip((page ?? 1 - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // Convert Campaigns to CampaignViewModels
             var campaignViewModels = new List<CampaignViewModel>();
-            foreach (var campaign in items)
+            foreach (var campaign in campaignList)
             {
                 campaignViewModels.Add(new CampaignViewModel(campaign));
             }
@@ -93,12 +100,17 @@ namespace PlacementsProject.Controllers
             {
                 return NotFound();
             }
+
+            // Can't edit Campaigns that have been marked as reviewed
+            if (campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
             return View(new CampaignViewModel(campaign));
         }
 
         // POST: Campaigns/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Reviewed")] Campaign campaign)
@@ -126,7 +138,7 @@ namespace PlacementsProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", new { id });
             }
             return View(new CampaignViewModel(campaign));
         }

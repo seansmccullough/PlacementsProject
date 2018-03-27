@@ -11,6 +11,9 @@ using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
+    /// <summary>
+    /// Comments Controller
+    /// </summary>
     [Authorize]
     public class CommentsController : Controller
     {
@@ -53,17 +56,35 @@ namespace PlacementsProject.Controllers
         // POST: Comments/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LineItemId,Text")] Comment comment)
+        public async Task<IActionResult> Create([Bind("LineItemId,Text")] CommentViewModel commentViewModel)
         {
+            LineItem lineItem = await _context.LineItems
+                .Include(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == commentViewModel.LineItemId);
+
+            if (lineItem == null)
+            {
+                return NotFound();
+            }
+
+            // Cannot leave comment if it's LineItem or Campaign have been marked as Reviewed
+            if (lineItem.Reviewed || lineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
             if (ModelState.IsValid)
             {
-                //TODO check if LineItem or Campaign is locked
+                // Create Comment
+                Comment comment = new Comment();
                 comment.User = await _userManager.GetUserAsync(HttpContext.User);
                 comment.ModifiedDateTime = DateTime.UtcNow;
+                comment.LineItem = lineItem;
+                comment.Text = commentViewModel.Text;
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Details", "LineItems", new {Id = comment.LineItemId });
+            return RedirectToAction("Details", "LineItems", new { lineItem.Id });
         }
 
         // GET: Comments/Edit/5
@@ -78,46 +99,54 @@ namespace PlacementsProject.Controllers
                 .Include(l => l.LineItem)
                 .ThenInclude(l => l.Campaign)
                 .SingleOrDefaultAsync(m => m.Id == id);
+
             if (comment == null)
             {
                 return NotFound();
             }
 
+            // Can't edit Comment if it's LineItem or Campaign have been marked as Reviewed
             if (comment.LineItem.Reviewed || comment.LineItem.Campaign.Reviewed)
             {
                 return BadRequest();
             }
 
             ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            // You can only edit your own Comments
             if (!comment.User.Equals(currentUser))
             {
                 return Unauthorized();
             }
-            ViewData["LineItemId"] = comment.LineItemId;
             return View(new CommentViewModel(comment));
         }
 
         // POST: Comments/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Text")] Comment comment)
+        public async Task<IActionResult> Edit(string id, [Bind("Text")] CommentViewModel commentViewModel)
         {
-            Comment previousComment = await _context.Comments
+            Comment comment = await _context.Comments
                 .Include(l => l.LineItem)
                 .ThenInclude(l => l.Campaign)
                 .SingleOrDefaultAsync(m => m.Id == id);
-            if (previousComment == null)
+
+            // Comment not found
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            if (previousComment.LineItem.Reviewed || previousComment.LineItem.Campaign.Reviewed)
+            // Comment can't be edited if it's LineItem or Campaign have been marked as Reviewed
+            if (comment.LineItem.Reviewed || comment.LineItem.Campaign.Reviewed)
             {
                 return BadRequest();
             }
 
             ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (!previousComment.User.Equals(currentUser))
+
+            // You can only edit your own Comments
+            if (!comment.User.Equals(currentUser))
             {
                 return Unauthorized();
             }
@@ -126,9 +155,9 @@ namespace PlacementsProject.Controllers
             {
                 try
                 {
-                    previousComment.ModifiedDateTime = DateTime.UtcNow;
-                    previousComment.Text = comment.Text;
-                    _context.Update(previousComment);
+                    comment.ModifiedDateTime = DateTime.UtcNow;
+                    comment.Text = commentViewModel.Text;
+                    _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -143,7 +172,7 @@ namespace PlacementsProject.Controllers
                     }
                 }
             }
-            return RedirectToAction("Details", "LineItems", new { Id = previousComment.LineItemId });
+            return RedirectToAction("Details", "LineItems", new { Id = comment.LineItemId });
         }
 
         // GET: Comments/Delete/5
@@ -154,37 +183,29 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
-            Comment previousComment = await _context.Comments
+            Comment comment = await _context.Comments
                 .Include(l => l.LineItem)
                 .ThenInclude(l => l.Campaign)
                 .SingleOrDefaultAsync(m => m.Id == id);
 
-            if (previousComment == null)
-            {
-                return NotFound();
-            }
-
-            if (previousComment.LineItem.Reviewed || previousComment.LineItem.Campaign.Reviewed)
-            {
-                return BadRequest();
-            }
-
-            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (!previousComment.User.Equals(currentUser))
-            {
-                return Unauthorized();
-            }
-
-            var comment = await _context.Comments
-                .Include(c => c.LineItem)
-                .Include(c => c.User)
-                .SingleOrDefaultAsync(m => m.Id == id);
             if (comment == null)
             {
                 return NotFound();
             }
 
-            ViewData["LineItemId"] = comment.LineItemId;
+            // Can't delete comment if it's LineItem or Campaign have been marked as Reviewed
+            if (comment.LineItem.Reviewed || comment.LineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            // You can only delete your own Comments
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (!comment.User.Equals(currentUser))
+            {
+                return Unauthorized();
+            }
+
             return View(new CommentViewModel(comment));
         }
 

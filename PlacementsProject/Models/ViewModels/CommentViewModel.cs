@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PlacementsProject.Models.ViewModels
 {
+    /// <summary>
+    /// View model for Comment
+    /// </summary>
     public class CommentViewModel
     {
         /// <summary>
@@ -38,10 +41,17 @@ namespace PlacementsProject.Models.ViewModels
         [Display(Name = "Last Modified Time")]
         public DateTime ModifiedDateTime { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CommentViewModel()
         {
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="comment">Comment</param>
         public CommentViewModel(Comment comment)
         {
             Id = comment.Id;

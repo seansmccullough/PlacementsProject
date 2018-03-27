@@ -11,6 +11,9 @@ using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
+    /// <summary>
+    /// Adjustments Controller
+    /// </summary>
     [Authorize]
     public class AdjustmentsController : Controller
     {
@@ -26,6 +29,7 @@ namespace PlacementsProject.Controllers
         // GET: Adjustments/Create
         public async Task<IActionResult> Create(int id)
         {
+            // Get LineItem this Adjustment will be associated with
             var lineItem = await _context.LineItems
                 .Include(l => l.Campaign)
                 .Include(l => l.Comments)
@@ -48,27 +52,29 @@ namespace PlacementsProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LineItemId,AdjustmentAmount")] AdjustmentViewModel adjustmentViewModel)
         {
+            LineItem lineItem = await _context.LineItems
+                .Include(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == adjustmentViewModel.LineItemId);
+
+            if (lineItem == null)
+            {
+                return NotFound();
+            }
+
+            // If LineItem or its Campaign have been marked as Reviewed
+            if (lineItem.Reviewed || lineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            // Adjustment amount must be > 0 and < the LineItem's BookedAmount
+            if (adjustmentViewModel.AdjustmentAmount < 0 || adjustmentViewModel.AdjustmentAmount > lineItem.BookedAmount)
+            {
+                return BadRequest();
+            }
+
             if (ModelState.IsValid)
             {
-                LineItem lineItem = await _context.LineItems
-                    .Include(l => l.Campaign)
-                    .SingleOrDefaultAsync(m => m.Id == adjustmentViewModel.LineItemId);
-
-                if (lineItem == null)
-                {
-                    return NotFound();
-                }
-
-                if (lineItem.Reviewed || lineItem.Campaign.Reviewed)
-                {
-                    return BadRequest();
-                }
-
-                if (adjustmentViewModel.AdjustmentAmount < 0 || adjustmentViewModel.AdjustmentAmount > lineItem.BookedAmount)
-                {
-                    return BadRequest();
-                }
-
                 // Create Adjustment
                 Adjustment adjustment = new Adjustment();
                 adjustment.User = await _userManager.GetUserAsync(HttpContext.User);

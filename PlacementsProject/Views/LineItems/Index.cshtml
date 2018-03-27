@@ -6,9 +6,6 @@
 }
 
 <h2>Line Items</h2>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <form asp-action="Index" method="get">
     <p>
         Find by name: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
@@ -22,36 +19,60 @@
     <tr>
         <th>
             Id 
-            <a asp-action="Index" asp-route-sortOrder="LineItemIdAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="LineItemIdDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="LineItemIdAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="LineItemIdDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Campaign Id
         </th>
         <th>
             Campaign Name
-            <a asp-action="Index" asp-route-sortOrder="CampaignNameAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="CampaignNameDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="CampaignNameAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="CampaignNameDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Booked Amount
-            <a asp-action="Index" asp-route-sortOrder="BookedAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="BookedAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="BookedAmountAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="BookedAmountDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Adjusted Amount
-            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Actual Amount
-            <a asp-action="Index" asp-route-sortOrder="ActualAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="ActualAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="ActualAmountAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="ActualAmountDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Reviewed
-            <a asp-action="Index" asp-route-sortOrder="ReviewedAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="ReviewedDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="ReviewedAsc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-top"></i>
+            </a>
+            <a asp-action="Index" asp-route-sortOrder="ReviewedDesc" asp-route-searchString="@ViewData["CurrentFilter"]">
+                <i class="glyphicon glyphicon-triangle-bottom"></i>
+            </a>
         </th>
         <th>
             Campaign Reviewed
