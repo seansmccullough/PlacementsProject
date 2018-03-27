@@ -34,6 +34,7 @@ namespace PlacementsProject.Models
         /// Amount to adjust LineItem BookedAmount
         /// </summary>
         [Display(Name= "Adjustment Amount")]
+        [Range(0, Double.MaxValue)]
         public double AdjustmentAmount { get; set; }
 
         /// <summary>

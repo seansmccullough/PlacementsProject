@@ -63,10 +63,21 @@ namespace PlacementsProject.Controllers
                     return BadRequest();
                 }
 
-                //TODO check if adjustment amount > booked amount
+                if (adjustment.AdjustmentAmount < 0 || adjustment.AdjustmentAmount > lineItem.BookedAmount)
+                {
+                    return BadRequest();
+                }
+
+                // Create Adjustment
                 adjustment.User = await _userManager.GetUserAsync(HttpContext.User);
                 adjustment.DateTime = DateTime.UtcNow;
                 _context.Add(adjustment);
+
+                // Update LineItem
+                lineItem.AdjustedAmount = adjustment.AdjustmentAmount;
+                lineItem.ActualAmount = lineItem.BookedAmount - adjustment.AdjustmentAmount;
+                lineItem.Adjustments.Add(adjustment);
+
                 await _context.SaveChangesAsync();
             }
 
