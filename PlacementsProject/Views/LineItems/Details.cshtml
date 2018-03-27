@@ -19,7 +19,7 @@
             @Html.DisplayNameFor(model => model.Campaign.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Campaign.Name)
+            <a asp-controller="Campaigns" asp-action="Details" asp-route-id="@Model.CampaignId">@Html.DisplayFor(model => model.Campaign.Name)</a>
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.BookedAmount)
@@ -45,8 +45,29 @@
         <dd>
             @Html.DisplayFor(model => model.Reviewed)
         </dd>
+        <dt>
+            Campaign Reviewed
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Campaign.Reviewed)
+        </dd>
     </dl>
 </div>
+<div>
+    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    {
+        <a class="btn btn-primary disabled">Mark as Reviewed</a>
+    }
+    else
+    {
+        <form asp-action="MarkAsReviewed">
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <input type="submit" value="Mark as Reviewed" class="btn btn-primary"/>
+            </div>
+        </form>
+    }
+    </div>
 <div>
     <h4>Adjustments</h4>
     <table class="table">
@@ -80,43 +101,68 @@
         }
         </tbody>
     </table>
-    <a asp-controller="Adjustments" asp-action="Create" asp-route-id="@Model.Id">Add an Adjustment</a>
+    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    {
+        <a class="btn btn-primary disabled">Add an Adjustment</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-controller="Adjustments" asp-action="Create" asp-route-id="@Model.Id">Add an Adjustment</a>
+    }
+
 </div>
 <div>
     <h4>Comments</h4>
     <table class="table">
         <thead>
-            <tr>
-                <th>
-                    Time
-                </th>
-                <th>
-                    User
-                </th>
-                <th>
-                    Text
-                </th>
-            </tr>
+        <tr>
+            <th>
+                Time
+            </th>
+            <th>
+                User
+            </th>
+            <th>
+                Text
+            </th>
+            <th></th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var comment in Model.Comments)
-            {
-                <tr>
-                    <th>
-                        @Html.DisplayFor(modelItem => comment.DateTime)
-                    </th>
-                    <th>
-                        @Html.DisplayFor(modelItem => comment.User.Email)
-                    </th>
-                    <th>
-                        @Html.DisplayFor(modelItem => comment.Text)
-                    </th>
-                </tr>
-            }
+        @foreach (var comment in Model.Comments)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => comment.ModifiedDateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => comment.User.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => comment.Text)
+                </td>
+                <td>
+                    @if (ViewData["UserId"].Equals(comment.UserId))
+                    {
+                        <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id">Edit</a> 
+                        <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id">Delete</a>
+                    }
+
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
-    <a asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Id">Add a Comment</a>
+    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    {
+        <a class="btn btn-primary disabled">Add a Comment</a>
+    }
+    else
+    {
+        <a class="btn btn-primary" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Id">Add a Comment</a>
+    }
+
 </div>
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-primary" asp-action="Index">Back to List</a>
 </div>

@@ -18,10 +18,10 @@
             @Html.DisplayFor(model => model.Text)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.DateTime)
+            @Html.DisplayNameFor(model => model.ModifiedDateTime)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.DateTime)
+            @Html.DisplayFor(model => model.ModifiedDateTime)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.LineItem)
@@ -33,13 +33,13 @@
             @Html.DisplayNameFor(model => model.User)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.User.Id)
+            @Html.DisplayFor(model => model.User.Email)
         </dd>
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-controller="LineItems" asp-action="Details" asp-route-id="@ViewData["LineItemId"]">Back to Line Item</a>
     </form>
 </div>

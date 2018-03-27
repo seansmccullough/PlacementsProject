@@ -40,8 +40,8 @@ namespace PlacementsProject.Models
         /// <summary>
         /// DateTime when Comment was created
         /// </summary>
-        [Display(Name = "Creation Time")]
-        public DateTime DateTime { get; set; }
+        [Display(Name = "Last Modified Time")]
+        public DateTime ModifiedDateTime { get; set; }
 
         /// <summary>
         /// LineItem associated with Comment

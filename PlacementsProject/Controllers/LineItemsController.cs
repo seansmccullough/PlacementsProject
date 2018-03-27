@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PlacementsProject.Data;
 using PlacementsProject.Models;
 
@@ -15,17 +17,21 @@ namespace PlacementsProject.Controllers
     public class LineItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<Program> _logger;
 
-        public LineItemsController(ApplicationDbContext context)
+        public LineItemsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<Program> logger)
         {
             _context = context;
+            _userManager = userManager;
+            _logger = logger;
         }
 
         // GET: LineItems
-        public async Task<IActionResult> Index(string sortOrder, int? page)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, int? page)
         {
-            var lineItems = from s in _context.LineItems
-                           select s;
+            var lineItems = from s in _context.LineItems.Include(l => l.Campaign)
+                select s;
             switch (sortOrder)
             {
                 case "LineItemIdAsc":
@@ -34,11 +40,11 @@ namespace PlacementsProject.Controllers
                 case "LineItemIdDesc":
                     lineItems = lineItems.OrderByDescending(r => r.Id);
                     break;
-                case "CampaignIdAsc":
-                    lineItems = lineItems.OrderBy(r => r.CampaignId);
+                case "CampaignNameAsc":
+                    lineItems = lineItems.OrderBy(r => r.Campaign.Name);
                     break;
-                case "CampaignIdDesc":
-                    lineItems = lineItems.OrderByDescending(r => r.CampaignId);
+                case "CampaignNameDesc":
+                    lineItems = lineItems.OrderByDescending(r => r.Campaign.Name);
                     break;
                 case "BookedAmountAsc":
                     lineItems = lineItems.OrderBy(r => r.BookedAmount);
@@ -70,7 +76,12 @@ namespace PlacementsProject.Controllers
                     break;
             }
 
+            if (searchString != null)
+            {
+                lineItems = lineItems.Where(s => s.Campaign.Name.Contains(searchString));
+            }
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentFilter"] = searchString;
             int pageSize = 25;
             return View(await PaginatedList<LineItem>.CreateAsync(lineItems.AsNoTracking(), page ?? 1, pageSize));
         }
@@ -94,6 +105,8 @@ namespace PlacementsProject.Controllers
             {
                 return NotFound();
             }
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            ViewData["UserId"] = currentUser.Id;
             return View(lineItem);
         }
 
@@ -157,21 +170,47 @@ namespace PlacementsProject.Controllers
                     _context.Update(lineItem);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
-                    if (!LineItemExists(lineItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    _logger.LogError(e, "LineItem edit failed", new Object[] {lineItem});
+                    throw e;
                 }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CampaignId"] = new SelectList(_context.Campaigns, "Id", "Id", lineItem.CampaignId);
             return View(lineItem);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAsReviewed(int id)
+        {
+            LineItem lineItem = await _context.LineItems
+                .Include(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == id);
+
+            if (lineItem == null)
+            {
+                return NotFound();
+            }
+
+            if (lineItem.Reviewed || lineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                lineItem.Reviewed = true;
+                _context.Update(lineItem);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Mark LineItem as Reviewed failed", new object[] {lineItem});
+                throw;
+            }
+            return RedirectToAction("Details", "LineItems", new { id });
         }
 
         // GET: LineItems/Delete/5

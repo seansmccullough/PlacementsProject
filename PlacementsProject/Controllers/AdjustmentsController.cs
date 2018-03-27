@@ -43,15 +43,27 @@ namespace PlacementsProject.Controllers
         }
 
         // POST: Adjustments/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LineItemId,AdjustmentAmount")] Adjustment adjustment)
         {
             if (ModelState.IsValid)
             {
-                //TODO check if LineItem.Reviewed == true or if adjustment amount > booked amount
+                LineItem lineItem = await _context.LineItems
+                    .Include(l => l.Campaign)
+                    .SingleOrDefaultAsync(m => m.Id == adjustment.LineItemId);
+
+                if (lineItem == null)
+                {
+                    return NotFound();
+                }
+
+                if (lineItem.Reviewed || lineItem.Campaign.Reviewed)
+                {
+                    return BadRequest();
+                }
+
+                //TODO check if adjustment amount > booked amount
                 adjustment.User = await _userManager.GetUserAsync(HttpContext.User);
                 adjustment.DateTime = DateTime.UtcNow;
                 _context.Add(adjustment);
@@ -59,11 +71,6 @@ namespace PlacementsProject.Controllers
             }
 
             return RedirectToAction("Details", "LineItems", new { id = adjustment.LineItemId });
-        }
-
-        private bool AdjustmentExists(string id)
-        {
-            return _context.Adjustments.Any(e => e.Id == id);
         }
     }
 }

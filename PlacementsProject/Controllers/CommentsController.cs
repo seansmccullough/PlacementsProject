@@ -59,8 +59,6 @@ namespace PlacementsProject.Controllers
         }
 
         // POST: Comments/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LineItemId,Text")] Comment comment)
@@ -69,7 +67,7 @@ namespace PlacementsProject.Controllers
             {
                 //TODO check if LineItem or Campaign is locked
                 comment.User = await _userManager.GetUserAsync(HttpContext.User);
-                comment.DateTime = DateTime.UtcNow;
+                comment.ModifiedDateTime = DateTime.UtcNow;
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
             }
@@ -84,33 +82,61 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments.SingleOrDefaultAsync(m => m.Id == id);
+            Comment comment = await _context.Comments
+                .Include(l => l.LineItem)
+                .ThenInclude(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == id);
             if (comment == null)
             {
                 return NotFound();
             }
-            ViewData["LineItemId"] = new SelectList(_context.LineItems, "Id", "Id", comment.LineItemId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", comment.UserId);
+
+            if (comment.LineItem.Reviewed || comment.LineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (!comment.User.Equals(currentUser))
+            {
+                return Unauthorized();
+            }
+            ViewData["LineItemId"] = comment.LineItemId;
             return View(comment);
         }
 
         // POST: Comments/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,LineItemId,UserId,Text,DateTime")] Comment comment)
+        public async Task<IActionResult> Edit(string id, [Bind("Text")] Comment comment)
         {
-            if (id != comment.Id)
+            Comment previousComment = await _context.Comments
+                .Include(l => l.LineItem)
+                .ThenInclude(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == id);
+            if (previousComment == null)
             {
                 return NotFound();
+            }
+
+            if (previousComment.LineItem.Reviewed || previousComment.LineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (!previousComment.User.Equals(currentUser))
+            {
+                return Unauthorized();
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(comment);
+                    previousComment.ModifiedDateTime = DateTime.UtcNow;
+                    previousComment.Text = comment.Text;
+                    _context.Update(previousComment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -124,11 +150,8 @@ namespace PlacementsProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["LineItemId"] = new SelectList(_context.LineItems, "Id", "Id", comment.LineItemId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", comment.UserId);
-            return View(comment);
+            return RedirectToAction("Details", "LineItems", new { Id = previousComment.LineItemId });
         }
 
         // GET: Comments/Delete/5
@@ -137,6 +160,27 @@ namespace PlacementsProject.Controllers
             if (id == null)
             {
                 return NotFound();
+            }
+
+            Comment previousComment = await _context.Comments
+                .Include(l => l.LineItem)
+                .ThenInclude(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == id);
+
+            if (previousComment == null)
+            {
+                return NotFound();
+            }
+
+            if (previousComment.LineItem.Reviewed || previousComment.LineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (!previousComment.User.Equals(currentUser))
+            {
+                return Unauthorized();
             }
 
             var comment = await _context.Comments
@@ -148,6 +192,7 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
+            ViewData["LineItemId"] = comment.LineItemId;
             return View(comment);
         }
 
@@ -156,10 +201,35 @@ namespace PlacementsProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var comment = await _context.Comments.SingleOrDefaultAsync(m => m.Id == id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Comment comment = await _context.Comments
+                .Include(l => l.LineItem)
+                .ThenInclude(l => l.Campaign)
+                .SingleOrDefaultAsync(m => m.Id == id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            if (comment.LineItem.Reviewed || comment.LineItem.Campaign.Reviewed)
+            {
+                return BadRequest();
+            }
+
+            ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (!comment.User.Equals(currentUser))
+            {
+                return Unauthorized();
+            }
+
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "LineItems", new { Id = comment.LineItemId });
         }
 
         private bool CommentExists(string id)

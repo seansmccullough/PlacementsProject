@@ -5,7 +5,15 @@
     ViewData["Title"] = "Line Items";
 }
 
-<h2>Index</h2>
+<h2>Line Items</h2>
+
+<form asp-action="Index" method="get">
+    <p>
+        Find by name: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+        <input type="submit" value="Search" class="btn btn-default" /> |
+        <a asp-action="Index">Back to Full List</a>
+    </p>
+</form>
 
 <table class="table">
     <thead>
@@ -17,8 +25,11 @@
         </th>
         <th>
             Campaign Id
-            <a asp-action="Index" asp-route-sortOrder="CampaignIdAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
-            <a asp-action="Index" asp-route-sortOrder="CampaignIdDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Campaign Name
+            <a asp-action="Index" asp-route-sortOrder="CampaignNameAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="CampaignNameDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
         </th>
         <th>
             Booked Amount
@@ -40,6 +51,9 @@
             <a asp-action="Index" asp-route-sortOrder="ReviewedAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
             <a asp-action="Index" asp-route-sortOrder="ReviewedDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
         </th>
+        <th>
+            Campaign Reviewed
+        </th>
         <th></th>
     </tr>
     </thead>
@@ -48,10 +62,13 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Id)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CampaignId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Campaign.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.BookedAmount)
@@ -66,8 +83,14 @@
                     @Html.DisplayFor(modelItem => item.Reviewed)
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    @Html.DisplayFor(modelItem => item.Campaign.Reviewed)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    @if (!(item.Reviewed || item.Campaign.Reviewed))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
                 </td>
             </tr>
         }
@@ -81,12 +104,14 @@
 
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-searchString="@ViewData["CurrentFilter"]"
    asp-route-page="@(Model.PageIndex - 1)"
    class="btn btn-default @prevDisabled">
     Previous
 </a>
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-searchString="@ViewData["CurrentFilter"]"
    asp-route-page="@(Model.PageIndex + 1)"
    class="btn btn-default @nextDisabled">
     Next
