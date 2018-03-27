@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PlacementsProject.Data;
 using PlacementsProject.Models;
+using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
@@ -76,14 +77,28 @@ namespace PlacementsProject.Controllers
                     break;
             }
 
+            //TODO this screams SQL injection!
             if (searchString != null)
             {
                 lineItems = lineItems.Where(s => s.Campaign.Name.Contains(searchString));
             }
+
+            double totalBookedAmount = lineItems.Sum(r => r.BookedAmount);
+            double totalAdjustedAmount = lineItems.Sum(r => r.AdjustedAmount);
+            double totalActualAmount = lineItems.Sum(r => r.AdjustedAmount);
+
+            int pageSize = 25;
+            var count = await lineItems.CountAsync();
+            var items = await lineItems.Skip((page ?? 1 - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<LineItemViewModel> lineItemViewModels = new List<LineItemViewModel>();
+            foreach (var lineItem in items)
+            {
+                lineItemViewModels.Add(new LineItemViewModel(lineItem));
+            }
             ViewData["CurrentSort"] = sortOrder;
             ViewData["CurrentFilter"] = searchString;
-            int pageSize = 25;
-            return View(await PaginatedList<LineItem>.CreateAsync(lineItems.AsNoTracking(), page ?? 1, pageSize));
+            return View(new LineItemIndexViewModel(lineItemViewModels, count, page ?? 1, 
+                pageSize, totalBookedAmount, totalAdjustedAmount, totalActualAmount));
         }
 
         // GET: LineItems/Details/5
@@ -107,31 +122,7 @@ namespace PlacementsProject.Controllers
             }
             ApplicationUser currentUser = await _userManager.GetUserAsync(HttpContext.User);
             ViewData["UserId"] = currentUser.Id;
-            return View(lineItem);
-        }
-
-        // GET: LineItems/Create
-        public IActionResult Create()
-        {
-            ViewData["CampaignId"] = new SelectList(_context.Campaigns, "Id", "Id");
-            return View();
-        }
-
-        // POST: LineItems/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CampaignId,Reviewed,BookedAmount,AdjustedAmount,ActualAmount")] LineItem lineItem)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(lineItem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CampaignId"] = new SelectList(_context.Campaigns, "Id", "Id", lineItem.CampaignId);
-            return View(lineItem);
+            return View(new LineItemViewModel(lineItem));
         }
 
         // GET: LineItems/Edit/5
@@ -148,7 +139,7 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
             ViewData["CampaignId"] = new SelectList(_context.Campaigns, "Id", "Id", lineItem.CampaignId);
-            return View(lineItem);
+            return View(new LineItemViewModel(lineItem));
         }
 
         // POST: LineItems/Edit/5
@@ -178,7 +169,7 @@ namespace PlacementsProject.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CampaignId"] = new SelectList(_context.Campaigns, "Id", "Id", lineItem.CampaignId);
-            return View(lineItem);
+            return View(new LineItemViewModel(lineItem));
         }
 
         [HttpPost]
@@ -229,7 +220,7 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
-            return View(lineItem);
+            return View(new LineItemViewModel(lineItem));
         }
 
         // POST: LineItems/Delete/5

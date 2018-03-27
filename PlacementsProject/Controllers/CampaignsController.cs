@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PlacementsProject.Data;
 using PlacementsProject.Models;
+using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
@@ -53,7 +52,14 @@ namespace PlacementsProject.Controllers
             }
             ViewData["CurrentSort"] = sortOrder;
             int pageSize = 25;
-            return View(await PaginatedList<Campaign>.CreateAsync(campaigns.AsNoTracking(), page ?? 1, pageSize));
+            var count = await campaigns.AsNoTracking().CountAsync();
+            var items = await campaigns.AsNoTracking().Skip((page ?? 1 - 1) * pageSize).Take(pageSize).ToListAsync();
+            var campaignViewModels = new List<CampaignViewModel>();
+            foreach (var campaign in items)
+            {
+                campaignViewModels.Add(new CampaignViewModel(campaign));
+            }
+            return View(new PaginatedList<CampaignViewModel>(campaignViewModels, count, page ?? 1, pageSize));
         }
 
         // GET: Campaigns/Details/5
@@ -71,29 +77,7 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
-            return View(campaign);
-        }
-
-        // GET: Campaigns/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Campaigns/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Reviewed")] Campaign campaign)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(campaign);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(campaign);
+            return View(new CampaignViewModel(campaign));
         }
 
         // GET: Campaigns/Edit/5
@@ -109,7 +93,7 @@ namespace PlacementsProject.Controllers
             {
                 return NotFound();
             }
-            return View(campaign);
+            return View(new CampaignViewModel(campaign));
         }
 
         // POST: Campaigns/Edit/5
@@ -144,36 +128,7 @@ namespace PlacementsProject.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(campaign);
-        }
-
-        // GET: Campaigns/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var campaign = await _context.Campaigns
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (campaign == null)
-            {
-                return NotFound();
-            }
-
-            return View(campaign);
-        }
-
-        // POST: Campaigns/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var campaign = await _context.Campaigns.SingleOrDefaultAsync(m => m.Id == id);
-            _context.Campaigns.Remove(campaign);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return View(new CampaignViewModel(campaign));
         }
 
         private bool CampaignExists(int id)

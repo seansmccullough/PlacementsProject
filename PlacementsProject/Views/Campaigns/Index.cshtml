@@ -1,11 +1,13 @@
-﻿@model PaginatedList<PlacementsProject.Models.Campaign>
+﻿@model PaginatedList<PlacementsProject.Models.ViewModels.CampaignViewModel>
 
 @{
     ViewData["Title"] = "Line Items";
 }
 
 <h2>Campaigns</h2>
-
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>

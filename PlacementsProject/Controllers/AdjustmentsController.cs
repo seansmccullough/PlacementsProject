@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlacementsProject.Data;
 using PlacementsProject.Models;
+using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
@@ -45,13 +46,13 @@ namespace PlacementsProject.Controllers
         // POST: Adjustments/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LineItemId,AdjustmentAmount")] Adjustment adjustment)
+        public async Task<IActionResult> Create([Bind("LineItemId,AdjustmentAmount")] AdjustmentViewModel adjustmentViewModel)
         {
             if (ModelState.IsValid)
             {
                 LineItem lineItem = await _context.LineItems
                     .Include(l => l.Campaign)
-                    .SingleOrDefaultAsync(m => m.Id == adjustment.LineItemId);
+                    .SingleOrDefaultAsync(m => m.Id == adjustmentViewModel.LineItemId);
 
                 if (lineItem == null)
                 {
@@ -63,25 +64,32 @@ namespace PlacementsProject.Controllers
                     return BadRequest();
                 }
 
-                if (adjustment.AdjustmentAmount < 0 || adjustment.AdjustmentAmount > lineItem.BookedAmount)
+                if (adjustmentViewModel.AdjustmentAmount < 0 || adjustmentViewModel.AdjustmentAmount > lineItem.BookedAmount)
                 {
                     return BadRequest();
                 }
 
                 // Create Adjustment
+                Adjustment adjustment = new Adjustment();
                 adjustment.User = await _userManager.GetUserAsync(HttpContext.User);
+                adjustment.AdjustmentAmount = adjustmentViewModel.AdjustmentAmount;
                 adjustment.DateTime = DateTime.UtcNow;
+                adjustment.LineItem = lineItem;
                 _context.Add(adjustment);
 
                 // Update LineItem
                 lineItem.AdjustedAmount = adjustment.AdjustmentAmount;
                 lineItem.ActualAmount = lineItem.BookedAmount - adjustment.AdjustmentAmount;
+                if (lineItem.Adjustments == null)
+                {
+                    lineItem.Adjustments = new List<Adjustment>();
+                }
                 lineItem.Adjustments.Add(adjustment);
 
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Details", "LineItems", new { id = adjustment.LineItemId });
+            return RedirectToAction("Details", "LineItems", new { id = adjustmentViewModel.LineItemId });
         }
     }
 }

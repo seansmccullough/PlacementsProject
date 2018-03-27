@@ -1,4 +1,4 @@
-﻿@model PlacementsProject.Models.LineItem
+﻿@model PlacementsProject.Models.ViewModels.LineItemViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -36,10 +36,10 @@
             @Html.DisplayFor(model => model.ActualAmount)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Campaign)
+            @Html.DisplayNameFor(model => model.CampaignId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Campaign.Id)
+            @Html.DisplayFor(model => model.CampaignId)
         </dd>
     </dl>
     

@@ -1,4 +1,4 @@
-﻿@model PlacementsProject.Models.LineItem
+﻿@model PlacementsProject.Models.ViewModels.LineItemViewModel
 @{
     ViewData["Title"] = "Details";
 }
@@ -10,16 +10,16 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Campaign.Id)
+            @Html.DisplayNameFor(model => model.CampaignId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Campaign.Id)
+            @Html.DisplayFor(model => model.CampaignId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Campaign.Name)
+            @Html.DisplayNameFor(model => model.CampaignName)
         </dt>
         <dd>
-            <a asp-controller="Campaigns" asp-action="Details" asp-route-id="@Model.CampaignId">@Html.DisplayFor(model => model.Campaign.Name)</a>
+            <a asp-controller="Campaigns" asp-action="Details" asp-route-id="@Model.CampaignId">@Html.DisplayFor(model => model.CampaignName)</a>
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.BookedAmount)
@@ -49,12 +49,12 @@
             Campaign Reviewed
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Campaign.Reviewed)
+            @Html.DisplayFor(model => model.CampaignReviewed)
         </dd>
     </dl>
 </div>
 <div>
-    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    @if (Model.Reviewed || Model.CampaignReviewed)
     {
         <a class="btn btn-primary disabled">Mark as Reviewed</a>
     }
@@ -95,13 +95,13 @@
                     @Html.DisplayFor(modelItem => adjustment.AdjustmentAmount)
                 </th>
                 <th>
-                    @Html.DisplayFor(modelItem => adjustment.User.Email)
+                    @Html.DisplayFor(modelItem => adjustment.UserEmail)
                 </th>
             </tr>
         }
         </tbody>
     </table>
-    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    @if (Model.Reviewed || Model.CampaignReviewed)
     {
         <a class="btn btn-primary disabled">Add an Adjustment</a>
     }
@@ -136,7 +136,7 @@
                     @Html.DisplayFor(modelItem => comment.ModifiedDateTime)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => comment.User.Email)
+                    @Html.DisplayFor(modelItem => comment.UserEmail)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => comment.Text)
@@ -153,7 +153,7 @@
         }
         </tbody>
     </table>
-    @if (Model.Reviewed || Model.Campaign.Reviewed)
+    @if (Model.Reviewed || Model.CampaignReviewed)
     {
         <a class="btn btn-primary disabled">Add a Comment</a>
     }

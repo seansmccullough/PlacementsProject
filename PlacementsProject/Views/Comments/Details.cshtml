@@ -1,4 +1,4 @@
-﻿@model PlacementsProject.Models.Comment
+﻿@model PlacementsProject.Models.ViewModels.CommentViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -23,16 +23,16 @@
             @Html.DisplayFor(model => model.ModifiedDateTime)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LineItem)
+            @Html.DisplayNameFor(model => model.LineItemId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.LineItem.Id)
+            @Html.DisplayFor(model => model.LineItemId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.User)
+            @Html.DisplayNameFor(model => model.UserId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.User.Id)
+            @Html.DisplayFor(model => model.UserId)
         </dd>
     </dl>
 </div>

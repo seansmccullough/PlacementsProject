@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PlacementsProject.Data;
 using PlacementsProject.Models;
+using PlacementsProject.Models.ViewModels;
 
 namespace PlacementsProject.Controllers
 {
@@ -22,13 +21,6 @@ namespace PlacementsProject.Controllers
         {
             _context = context;
             _userManager = userManager;
-        }
-
-        // GET: Comments
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Comments.Include(c => c.LineItem).Include(c => c.User);
-            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Comments/Details/5
@@ -48,7 +40,7 @@ namespace PlacementsProject.Controllers
                 return NotFound();
             }
 
-            return View(comment);
+            return View(new CommentViewModel(comment));
         }
 
         // GET: Comments/Create
@@ -102,7 +94,7 @@ namespace PlacementsProject.Controllers
                 return Unauthorized();
             }
             ViewData["LineItemId"] = comment.LineItemId;
-            return View(comment);
+            return View(new CommentViewModel(comment));
         }
 
         // POST: Comments/Edit/5
@@ -193,7 +185,7 @@ namespace PlacementsProject.Controllers
             }
 
             ViewData["LineItemId"] = comment.LineItemId;
-            return View(comment);
+            return View(new CommentViewModel(comment));
         }
 
         // POST: Comments/Delete/5

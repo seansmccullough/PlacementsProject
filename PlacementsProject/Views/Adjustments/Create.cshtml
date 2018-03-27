@@ -1,4 +1,4 @@
-﻿@model PlacementsProject.Models.Adjustment
+﻿@model PlacementsProject.Models.ViewModels.AdjustmentViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -30,16 +30,17 @@
 </dl>
 <div class="row">
     <div class="col-md-4">
+        <!-- TODO Add client side validation for AdjustmentAmount is position and less than BookedAmount -->
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="AdjustmentAmount" class="control-label"></label>
-                <input asp-for="AdjustmentAmount" class="form-control" />
+                <input asp-for="AdjustmentAmount" class="form-control"/>
                 <span asp-validation-for="AdjustmentAmount" class="text-danger"></span>
                 <input asp-for="LineItemId" type="hidden" value=@ViewData["LineItemId"]/>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Create" class="btn btn-default"/>
             </div>
         </form>
     </div>

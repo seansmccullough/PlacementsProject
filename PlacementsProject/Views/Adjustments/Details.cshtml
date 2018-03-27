@@ -1,4 +1,4 @@
-﻿@model PlacementsProject.Models.Adjustment
+﻿@model PlacementsProject.Models.ViewModels.AdjustmentViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -23,16 +23,16 @@
             @Html.DisplayFor(model => model.DateTime)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LineItem)
+            @Html.DisplayNameFor(model => model.LineItemId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.LineItem.Id)
+            @Html.DisplayFor(model => model.LineItemId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.User)
+            @Html.DisplayNameFor(model => model.UserEmail)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.User.Id)
+            @Html.DisplayFor(model => model.UserEmail)
         </dd>
     </dl>
 </div>
