@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,11 +23,13 @@ namespace PlacementsProject.Models
         /// <summary>
         /// LineItem Id, foreign key
         /// </summary>
+        [Display(Name = "Line Item Id")]
         public int LineItemId { get; set; }
 
         /// <summary>
         /// User Id, foreign key
         /// </summary>
+        [Display(Name = "User Id")]
         public string UserId { get; set; }
 
         /// <summary>
@@ -37,6 +40,7 @@ namespace PlacementsProject.Models
         /// <summary>
         /// DateTime when Comment was created
         /// </summary>
+        [Display(Name = "Creation Time")]
         public DateTime DateTime { get; set; }
 
         /// <summary>

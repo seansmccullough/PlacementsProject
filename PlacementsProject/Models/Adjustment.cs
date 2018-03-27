@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,11 +33,13 @@ namespace PlacementsProject.Models
         /// <summary>
         /// Amount to adjust LineItem BookedAmount
         /// </summary>
+        [Display(Name= "Adjustment Amount")]
         public double AdjustmentAmount { get; set; }
 
         /// <summary>
         /// DateTime when this Adjustment was created
         /// </summary>
+        [Display(Name="Adjustment Time")]
         public DateTime DateTime { get; set; }
 
         /// <summary>

@@ -1,0 +1,93 @@
+﻿@using Microsoft.CodeAnalysis.CSharp.Syntax
+@model PaginatedList<PlacementsProject.Models.LineItem>
+
+@{
+    ViewData["Title"] = "Line Items";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            Id 
+            <a asp-action="Index" asp-route-sortOrder="LineItemIdAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="LineItemIdDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Campaign Id
+            <a asp-action="Index" asp-route-sortOrder="CampaignIdAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="CampaignIdDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Booked Amount
+            <a asp-action="Index" asp-route-sortOrder="BookedAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="BookedAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Adjusted Amount
+            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="AdjustedAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Actual Amount
+            <a asp-action="Index" asp-route-sortOrder="ActualAmountAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="ActualAmountDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th>
+            Reviewed
+            <a asp-action="Index" asp-route-sortOrder="ReviewedAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+            <a asp-action="Index" asp-route-sortOrder="ReviewedDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CampaignId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookedAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AdjustedAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ActualAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reviewed)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex - 1)"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex + 1)"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

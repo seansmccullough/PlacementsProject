@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace PlacementsProject.Models
         /// <summary>
         /// CampaignId, foreign key
         /// </summary>
+        [Display(Name = "Campaign Id")]
         public int CampaignId { get; set; }
 
         /// <summary>
@@ -30,16 +32,19 @@ namespace PlacementsProject.Models
         /// <summary>
         /// Booked Amount
         /// </summary>
+        [Display(Name = "Booked Amount")]
         public double BookedAmount { get; set; }
 
         /// <summary>
         /// Adjusted Amount
         /// </summary>
+        [Display(Name = "Adjusted Amount")]
         public double AdjustedAmount { get; set; }
 
         /// <summary>
         /// Booked Amount - Adjusted Amount
         /// </summary>
+        [Display(Name = "Actual Amount")]
         public double ActualAmount { get; set; }
 
         /// <summary>

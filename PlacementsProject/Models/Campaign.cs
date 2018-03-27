@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,11 +16,13 @@ namespace PlacementsProject.Models
         /// Campaign Id, primary key.
         /// </summary>
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Display(Name="Campaign Id")]
         public int Id { get; set; }
 
         /// <summary>
         /// Campaign name
         /// </summary>
+        [Display(Name="Campaign Name")]
         public string Name { get; set; }
 
         /// <summary>

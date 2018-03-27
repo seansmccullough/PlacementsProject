@@ -1,0 +1,122 @@
+﻿@model PlacementsProject.Models.LineItem
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>LineItem @Html.DisplayFor(model => model.Id)</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Campaign.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Campaign.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Campaign.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Campaign.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BookedAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BookedAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AdjustedAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AdjustedAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ActualAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ActualAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Reviewed)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Reviewed)
+        </dd>
+    </dl>
+</div>
+<div>
+    <h4>Adjustments</h4>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                Time
+            </th>
+            <th>
+                Amount
+            </th>
+            <th>
+                User
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var adjustment in Model.Adjustments)
+        {
+            <tr>
+                <th>
+                    @Html.DisplayFor(modelItem => adjustment.DateTime)
+                </th>
+                <th>
+                    @Html.DisplayFor(modelItem => adjustment.AdjustmentAmount)
+                </th>
+                <th>
+                    @Html.DisplayFor(modelItem => adjustment.User.Email)
+                </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <a asp-controller="Adjustments" asp-action="Create" asp-route-id="@Model.Id">Add an Adjustment</a>
+</div>
+<div>
+    <h4>Comments</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Time
+                </th>
+                <th>
+                    User
+                </th>
+                <th>
+                    Text
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var comment in Model.Comments)
+            {
+                <tr>
+                    <th>
+                        @Html.DisplayFor(modelItem => comment.DateTime)
+                    </th>
+                    <th>
+                        @Html.DisplayFor(modelItem => comment.User.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayFor(modelItem => comment.Text)
+                    </th>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Id">Add a Comment</a>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,68 @@
+﻿@model PaginatedList<PlacementsProject.Models.Campaign>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Campaigns</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Campaign Id
+                <a asp-action="Index" asp-route-sortOrder="CampaignIdAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+                <a asp-action="Index" asp-route-sortOrder="CampaignIdDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            </th>
+            <th>
+                Name
+                <a asp-action="Index" asp-route-sortOrder="NameAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+                <a asp-action="Index" asp-route-sortOrder="NameDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            </th>
+            <th>
+                Reviewed
+                <a asp-action="Index" asp-route-sortOrder="ReviewedAsc"><i class="glyphicon glyphicon-triangle-top"></i></a>
+                <a asp-action="Index" asp-route-sortOrder="ReviewedDesc"><i class="glyphicon glyphicon-triangle-bottom"></i></a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reviewed)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex - 1)"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex + 1)"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
