@@ -51,13 +51,18 @@ grand-total).**
   - LineItems can be filtered by Campaign name via the search box on the LineItem Index page.  The totals at the bottom of the page are updated to include the current filter
 - The user should be able to share and reuse filters between users.
 - **The user should be able to add comments on an individual line-item.**
-  - Users can create, edit, and delete comments on LineItems that haven't been marked as Reviewed
+  - Users can create, edit, and delete (their own) comments  on LineItems that haven't been marked as Reviewed
 - **The user should be able to see a history of all the adjustments/comments/changes/etc. made
 to the invoice by different users.**
   - Users can see the history of all Adjustments and Comments fron a LineItem on the LineItem Detail page.
+  
+  ### Other features I implemented: ###
+  - Users can delete LineItems
+  - Users can edit Campaign name
 
 ## Areas for Improvement ##
 - Unit tests!  I spent a significant amount of time on this project, and did not get around to unit testing.  I unit test almost all my code at work
 - LineItemController.Index() is open to possible SQL injection via the searchString parameter
 - Add client-side validation for creating Adjustments.  Right now, the page will let you submit the form with AdjustmentAmount > BookedAmount.  The backend validation catches this, but client side validation would have been ideal
-- Implement LineItem and Campaign create/delete.  
+- Implement LineItem create and Campaign create/delete.
+- Show LineItems associated with Campaign on Campaign Detail page
