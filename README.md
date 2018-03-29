@@ -1,8 +1,10 @@
 # PlacementsProject
 
+This is an ASP.NET Core web site.  
+
 Please keep in mind I'm a backend software engineering.  I'm not a web developer or designer, and I have limited experience with web development and Javascript.
 
-## How to run:
+## How to run on Windows:
 1. Download and install Visual Studio Community and the "ASP.NET and web development" Workload https://www.visualstudio.com/vs/community/
 2. Clone this repository
 3. Open PlacementsProject.sln in Visual Studio, and hit run.  The database will be created and seeded automatically.
